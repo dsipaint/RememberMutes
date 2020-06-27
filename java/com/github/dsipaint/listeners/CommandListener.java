@@ -1,0 +1,166 @@
+package com.github.dsipaint.listeners;
+
+import com.github.dsipaint.main.Main;
+
+import net.dv8tion.jda.api.Permission;
+import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.Role;
+import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
+import net.dv8tion.jda.api.hooks.ListenerAdapter;
+
+public class CommandListener
+  extends ListenerAdapter
+{
+  public void onGuildMessageReceived(GuildMessageReceivedEvent e)
+  {
+	  
+    if(isStaff(e.getMember()))
+    {
+      
+      String msg = e.getMessage().getContentRaw();
+      String[] args = msg.split(" ");
+      
+      if(args[0].equalsIgnoreCase("^rememberunmute"))
+      {
+        
+        if(args.length == 1)
+        {
+          
+          e.getChannel().sendMessage("Please specify a user").queue();
+          
+          return;
+        } 
+        
+        if(args[1].matches("\\d{18}") && e.getGuild().getMemberById(args[1]) != null)
+        {
+          
+          if(e.getGuild().getMemberById(args[1]).getVoiceState().inVoiceChannel())
+          {
+            
+            e.getGuild().getMemberById(args[1]).mute(false).queue();
+            e.getChannel().sendMessage("This user was still in a vc! I unmuted them :)").queue();
+            
+            return;
+          }
+          
+          Main.unmutelist.add(e.getGuild().getMemberById(args[1]));
+          e.getChannel().sendMessage("I'll make sure to unmute " + 
+              e.getGuild().getMemberById(args[1]).getEffectiveName() + 
+              " when they next join a vc!").queue();
+
+          return;
+        } 
+        
+        if(args[1].matches("<@!\\d{18}>"))
+        {
+          String id = args[1].substring(3, args[1].length() - 1);
+          
+          if(e.getGuild().getMemberById(id).getVoiceState().inVoiceChannel())
+          {
+            
+            e.getGuild().getMemberById(id).mute(false).queue();
+            e.getChannel().sendMessage("This user was still in a vc! I unmuted them :)").queue();
+            
+            return;
+          }
+          
+          Main.unmutelist.add(e.getGuild().getMemberById(id));
+          e.getChannel().sendMessage("I'll make sure to unmute " + 
+              e.getGuild().getMemberById(id).getEffectiveName() + 
+              " when they next join a vc!").queue();
+          
+          return;
+        } 
+      } 
+      
+      if(args[0].equalsIgnoreCase("^remembermute"))
+      {
+        
+        if(args.length == 1)
+        {
+          
+          e.getChannel().sendMessage("Please specify a user").queue();
+          
+          return;
+        } 
+        
+        if(args[1].matches("\\d{18}") && e.getGuild().getMemberById(args[1]) != null)
+        {
+          
+          if(e.getGuild().getMemberById(args[1]).getVoiceState().inVoiceChannel())
+          {
+            
+            e.getGuild().getMemberById(args[1]).mute(true).queue();
+            e.getChannel().sendMessage("This user was still in a vc! I muted them :)").queue();
+            
+            return;
+          }
+          
+          Main.mutelist.add(e.getGuild().getMemberById(args[1]));
+          e.getChannel().sendMessage("I'll make sure to mute " + 
+              e.getGuild().getMemberById(args[1]).getEffectiveName() + 
+              " when they next join a vc!").queue();
+
+          
+          return;
+        } 
+        
+        if(args[1].matches("<@!\\d{18}>"))
+        {
+
+          
+          String id = args[1].substring(3, args[1].length() - 1);
+          
+          if(e.getGuild().getMemberById(id).getVoiceState().inVoiceChannel())
+          {
+            
+            e.getGuild().getMemberById(id).mute(true).queue();
+            e.getChannel().sendMessage("This user was still in a vc! I muted them :)").queue();
+            
+            return;
+          } 
+          Main.mutelist.add(e.getGuild().getMemberById(id));
+          e.getChannel().sendMessage("I'll make sure to mute " + 
+              e.getGuild().getMemberById(id).getEffectiveName() + 
+              " when they next join a vc!").queue();
+          return;
+        }
+      } 
+    } 
+  }
+
+
+
+
+  
+  public static boolean isStaff(Member m) {
+    if(m.isOwner()) {
+      return true;
+    }
+    
+    if(m.hasPermission(new Permission[] { Permission.ADMINISTRATOR })) {
+      return true;
+    }
+    String str;
+    switch ((str = m.getGuild().getId()).hashCode()) { case -749500513: if(!str.equals("565623426501443584")) {
+          break;
+        }
+        for (Role r : m.getRoles()) {
+          
+          if(r.getId().equals("565626094917648386"))
+            return true; 
+        }  break;
+      case 1797127915:
+        if(!str.equals("640254333807755304"))
+          break; 
+        for (Role r : m.getRoles()) {
+          
+          if(r.getId().equals("640255355401535499")) {
+            return true;
+          }
+        } 
+        break; }
+    
+    return false;
+  }
+}
